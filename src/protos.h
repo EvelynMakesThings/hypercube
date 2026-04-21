@@ -44,6 +44,9 @@ extern void addserver(char *servername);
 extern char *getservername(int n);
 extern void writeservercfg();
 
+// rendersdl
+extern SDL_Window *screen;
+
 // rendergl
 extern void gl_init(int w, int h);
 extern void cleangl();

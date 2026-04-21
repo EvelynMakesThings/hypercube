@@ -1,5 +1,5 @@
 #include "cube.h"
-#include "SDL/SDL_mixer.h"
+#include "SDL2/SDL_mixer.h"
 
 #define MAXCHAN 32
 #define SOUNDFREQ 22050

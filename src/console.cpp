@@ -88,7 +88,9 @@ namespace console
   /*! Turns input to the command line on or off */
   static void saycommand(const char *init)
   {
-    SDL_EnableUNICODE(saycommandon = (init!=NULL));
+    // TODO: SDL_EnableUNICODE was removed, research more later.
+    //SDL_EnableUNICODE(saycommandon = (init!=NULL));
+    saycommandon = (init!=NULL);
     if (!editmode) keyrepeat(saycommandon);
     if (!init) init = "";
     strcpy_s(commandbuf, init);
@@ -98,7 +100,7 @@ namespace console
 
 #ifndef WIN32
 #include <X11/Xlib.h>
-#include <SDL/SDL_syswm.h>
+#include <SDL2/SDL_syswm.h>
 #endif
 
   static void paste()
@@ -114,7 +116,9 @@ namespace console
     SDL_SysWMinfo wminfo;
     SDL_VERSION(&wminfo.version);
     wminfo.subsystem = SDL_SYSWM_X11;
-    if (!SDL_GetWMInfo(&wminfo)) return;
+    // This line is broken and does NOT work! Replaced.
+    //if (!SDL_GetWMInfo(&wminfo)) return;
+    if (!SDL_GetWindowWMInfo(screen, &wminfo)) return;
     int cbsize;
     char *cb = XFetchBytes(wminfo.info.x11.display, &cbsize);
     if (!cb || !cbsize) return;

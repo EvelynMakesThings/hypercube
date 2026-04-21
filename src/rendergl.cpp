@@ -235,7 +235,9 @@ void addstrip(int tex, int start, int n)
 VARFP(gamma, 30, 100, 300,
 {
     float f = gamma/100.0f;
-    if(SDL_SetGamma(f,f,f)==-1)
+    Uint16 value[256];
+    SDL_CalculateGammaRamp(f,value);
+    if(SDL_SetWindowGammaRamp(screen,value,value,value)==-1)
     {
         console::out("Could not set gamma (card/driver doesn't support it?)");
         console::out("sdl: %s", SDL_GetError());

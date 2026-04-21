@@ -1,13 +1,14 @@
 // serverbrowser.cpp: eihrul's concurrent resolver, and server browser window management
 
 #include "cube.h"
-#include "SDL/SDL_thread.h"
+#include "SDL2/SDL_thread.h"
 
 struct resolverthread
 {
     SDL_Thread *thread;
     char *query;
     int starttime;
+    bool quit;
 };
 
 struct resolverresult
@@ -29,6 +30,7 @@ int resolverloop(void * data)
     for(;;)
     {
         SDL_SemWait(resolversem);
+        if (rt->quit) return 0;
         SDL_LockMutex(resolvermutex);
         if(resolverqueries.empty())
         {
@@ -62,7 +64,9 @@ void resolverinit(int threads, int limit)
         resolverthread &rt = resolverthreads.add();
         rt.query = NULL;
         rt.starttime = 0;
-        rt.thread = SDL_CreateThread(resolverloop, &rt);
+        // SDL_CreateThread now also takes a name for the thread. This will be ignored for now.
+        //rt.thread = SDL_CreateThread(resolverloop, &rt);
+        rt.thread = SDL_CreateThread(resolverloop, NULL, &rt);
         --threads;
     };
 };
@@ -70,11 +74,21 @@ void resolverinit(int threads, int limit)
 void resolverstop(resolverthread &rt, bool restart)
 {
     SDL_LockMutex(resolvermutex);
-    SDL_KillThread(rt.thread);
+    // This function no longer exists. Use mutex instead.
+    //SDL_KillThread(rt.thread);
+    // New code
+    rt.quit = true;
+    SDL_SemPost(resolversem);
+    if (rt.thread)
+        SDL_WaitThread(rt.thread, NULL);
+
+
     rt.query = NULL;
     rt.starttime = 0;
     rt.thread = NULL;
-    if(restart) rt.thread = SDL_CreateThread(resolverloop, &rt);
+    // SDL_CreateThread now also takes a name for the thread. This will be ignored for now.
+    //if(restart) rt.thread = SDL_CreateThread(resolverloop, &rt);
+    if(restart) rt.thread = SDL_CreateThread(resolverloop, NULL, &rt);
     SDL_UnlockMutex(resolvermutex);
 }; 
 

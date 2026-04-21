@@ -72,23 +72,27 @@ void screenshot()
 COMMAND(screenshot, ARG_NONE);
 COMMAND(quit, ARG_NONE);
 
+// TODO: Review what this does. Seems like it is no longer has a use in SDL2
 void keyrepeat(bool on)
 {
-    SDL_EnableKeyRepeat(on ? SDL_DEFAULT_REPEAT_DELAY : 0,
-                             SDL_DEFAULT_REPEAT_INTERVAL);
+    //SDL_EnableKeyRepeat(on ? SDL_DEFAULT_REPEAT_DELAY : 0,
+    //                         SDL_DEFAULT_REPEAT_INTERVAL);
 };
 
 VARF(gamespeed, 10, 100, 1000, if(multiplayer()) gamespeed = 100);
 VARP(minmillis, 0, 5, 1000);
-VARF(grabmouse, 0, 1, 1, {SDL_WM_GrabInput(grabmouse ? SDL_GRAB_ON : SDL_GRAB_OFF);});
+//VARF(grabmouse, 0, 1, 1, {SDL_SetWindowGrab(grabmouse ? SDL_TRUE : SDL_FALSE);});
 
 int islittleendian = 1;
 int framesinmap = 0;
 
+SDL_Window *screen;
+
 int main(int argc, char **argv)
 {    
     bool dedicated = false;
-    int fs = SDL_FULLSCREEN, par = 0, uprate = 0, maxcl = 4;
+    // Use new DESKTOP fullscreen mode for my sanity.
+    int fs = SDL_WINDOW_FULLSCREEN_DESKTOP, par = 0, uprate = 0, maxcl = 4;
     const char *sdesc = "", *ip = "", *passwd = "";
     const char *master = NULL;
     islittleendian = *((char *)&islittleendian);
@@ -137,11 +141,18 @@ int main(int argc, char **argv)
 
     log("video: mode");
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    if(SDL_SetVideoMode(scr_w, scr_h, 0, SDL_OPENGL|fs)==NULL) fatal("Unable to create OpenGL screen");
+
+    // Fix this
+    //if(SDL_SetVideoMode(scr_w, scr_h, 0, SDL_OPENGL|fs)==NULL) fatal("Unable to create OpenGL screen");
+    screen = SDL_CreateWindow("cube engine",
+        SDL_WINDOWPOS_UNDEFINED,
+        SDL_WINDOWPOS_UNDEFINED,
+        scr_w, scr_h, fs|SDL_WINDOW_OPENGL);
+    SDL_GL_CreateContext(screen);
+
 
     log("video: misc");
-    SDL_WM_SetCaption("cube engine", NULL);
-    SDL_WM_GrabInput(SDL_GRAB_ON);
+    SDL_SetRelativeMouseMode(SDL_TRUE);
     keyrepeat(true);
     SDL_ShowCursor(0);
 
@@ -194,7 +205,7 @@ int main(int argc, char **argv)
         fps = (1000.0f/curtime+fps*50)/51;
         computeraytable(player1->o.x, player1->o.y);
         readdepth(scr_w, scr_h);
-        SDL_GL_SwapBuffers();
+        SDL_GL_SwapWindow(screen);
         sound::updatevol();
         if(framesinmap++<5)    // cheap hack to get rid of initial sparklies, even when triple buffering etc.
         {
@@ -214,8 +225,14 @@ int main(int argc, char **argv)
                     break;
 
                 case SDL_KEYDOWN: 
-                case SDL_KEYUP: 
-                    console::keypress(event.key.keysym.sym, event.key.state==SDL_PRESSED, event.key.keysym.unicode);
+                case SDL_KEYUP:
+                    console::keypress(event.key.keysym.sym, event.key.state==SDL_PRESSED, 0);
+                    break;
+                case SDL_TEXTINPUT:
+                    // New SDL input stuff!
+                    // TODO: Make text not duplicate on toggle
+                    for(int i = 0; event.text.text[i]; i++)
+                        console::keypress(0, true, (int)event.text.text[i]);
                     break;
 
                 case SDL_MOUSEMOTION:
