@@ -1,6 +1,9 @@
 // main.cpp: initialisation & main loop
 
 #include "cube.h"
+#include <GL/gl.h>
+#include <SDL2/SDL_mouse.h>
+#include <SDL2/SDL_video.h>
 
 void cleanup(char *msg)         // single program exit point;
 {
@@ -16,7 +19,7 @@ void cleanup(char *msg)         // single program exit point;
         #ifdef WIN32
         MessageBox(NULL, msg, "cube fatal error", MB_OK|MB_SYSTEMMODAL);
         #else
-        printf(msg);
+        printf("%s", msg);
         #endif
     };
     SDL_Quit();
@@ -81,7 +84,8 @@ void keyrepeat(bool on)
 
 VARF(gamespeed, 10, 100, 1000, if(multiplayer()) gamespeed = 100);
 VARP(minmillis, 0, 5, 1000);
-//VARF(grabmouse, 0, 1, 1, {SDL_SetWindowGrab(grabmouse ? SDL_TRUE : SDL_FALSE);});
+VARFP(grabmouse, 0, 1, 1, {SDL_SetRelativeMouseMode(grabmouse ? SDL_TRUE : SDL_FALSE);});
+VARFP(showmouse, 0, 1, 1, {SDL_ShowCursor(showmouse);});
 
 int islittleendian = 1;
 int framesinmap = 0;
@@ -147,12 +151,12 @@ int main(int argc, char **argv)
     screen = SDL_CreateWindow("cube engine",
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
-        scr_w, scr_h, fs|SDL_WINDOW_OPENGL);
+        scr_w, scr_h, fs|SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
     SDL_GL_CreateContext(screen);
 
 
     log("video: misc");
-    SDL_SetRelativeMouseMode(SDL_TRUE);
+    //SDL_SetRelativeMouseMode(SDL_TRUE);
     keyrepeat(true);
     SDL_ShowCursor(0);
 
@@ -216,6 +220,8 @@ int main(int argc, char **argv)
         gl_drawframe(scr_w, scr_h, fps);
         SDL_Event event;
         int lasttype = 0, lastbut = 0;
+        grabmouse = true;
+        showmouse = false;
         while(SDL_PollEvent(&event))
         {
             switch(event.type)
@@ -246,6 +252,13 @@ int main(int argc, char **argv)
                     console::keypress(-event.button.button, event.button.state!=0, 0);
                     lasttype = event.type;
                     lastbut = event.button.button;
+                    break;
+                case SDL_WINDOWEVENT:
+                    if(event.window.event == SDL_WINDOWEVENT_RESIZED) {
+                        scr_w = event.window.data1;
+                        scr_h = event.window.data2;
+                        glViewport(0,0,scr_w, scr_h);
+                    }
                     break;
             }
         };
