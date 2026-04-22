@@ -164,6 +164,7 @@ void md2::render(vec &light, int frame, int range, float x, float y, float z, fl
 			if(numVertex>0) { glBegin(GL_TRIANGLE_STRIP); }
 			else            { glBegin(GL_TRIANGLE_FAN); numVertex = -numVertex; };
 
+            // Sometimes crashes due to out of memory reads! Messing with animation speeds can cause this issue! Inconsistent.
 			loopi(numVertex)
 			{
 				float tu = *((float*)command++);
