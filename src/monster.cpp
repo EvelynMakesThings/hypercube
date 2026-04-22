@@ -311,7 +311,7 @@ void monsterthink()
         entity &e = ents[i];
         if(e.type!=TELEPORT) continue;
         if(OUTBORD(e.x, e.y)) continue;
-        vec v = { e.x, e.y, S(e.x, e.y)->floor };
+        vec v = { static_cast<float>(e.x), static_cast<float>(e.y), static_cast<float>(S(e.x, e.y)->floor) };
         loopv(monsters) if(monsters[i]->state==CS_DEAD)
         {
 			if(lastmillis-monsters[i]->lastaction<2000)
@@ -319,9 +319,7 @@ void monsterthink()
 				monsters[i]->move = 0;
 				moveplayer(monsters[i], 1, false);
 			};
-        }
-        else
-        {
+        } else {
             v.z += monsters[i]->eyeheight;
             vdist(dist, t, monsters[i]->o, v);
             v.z -= monsters[i]->eyeheight;

@@ -157,7 +157,7 @@ void renderents()       // show sparkly thingies for map entities in edit mode
     {
         entity &e = ents[i];
         if(e.type==NOTUSED) continue;
-        vec v = { e.x, e.y, e.z };
+        vec v = { static_cast<float>(e.x), static_cast<float>(e.y), static_cast<float>(e.z) };
         particle_splash(2, 2, 40, v);
     };
     int e = closestent();
@@ -214,6 +214,7 @@ void readdepth(int w, int h)
 {
     glReadPixels(w/2, h/2, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &cursordepth);
     double worldx = 0, worldy = 0, worldz = 0;
+    // Possible loss of precision according to the ide.
     gluUnProject(w/2, h/2, depthcorrect(cursordepth), mm, pm, viewport, &worldx, &worldz, &worldy);
     worldpos.x = (float)worldx;
     worldpos.y = (float)worldy;
