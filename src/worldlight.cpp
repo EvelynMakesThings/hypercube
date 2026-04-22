@@ -187,7 +187,7 @@ void dodynlight(vec &vold, vec &v, int reach, int strength, dynent *owner)
 
     dlights.add(blockcopy(b));      // backup area before rendering in dynlight
 
-    persistent_entity l = { (int)v.x, (int)v.y, (int)v.z, reach, LIGHT, strength, 0, 0 };
+    persistent_entity l = { static_cast<short>((int)v.x), static_cast<short>((int)v.y), static_cast<short>((int)v.z), static_cast<short>(reach), LIGHT, static_cast<uchar>(strength), 0, 0 };
     calclightsource(l);
     postlightarea(b);
 };

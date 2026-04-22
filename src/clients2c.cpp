@@ -256,7 +256,7 @@ void localservertoclient(uchar *buf, int len)   // processes any updates from th
             uint i = getint(p);
             setspawn(i, true);
             if(i>=(uint)ents.length()) break;
-            vec v = { ents[i].x, ents[i].y, ents[i].z };
+            vec v = { static_cast<float>(ents[i].x), static_cast<float>(ents[i].y), static_cast<float>(ents[i].z) };
             sound::play(S_ITEMSPAWN, &v); 
             break;
         };

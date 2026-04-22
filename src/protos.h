@@ -1,5 +1,5 @@
 // protos for ALL external functions in cube... 
-// The IDE is complaining a lot about missing types in this file, but the compiler is fine.
+// IDE DOES NOTHING BUT COMPLAIN COMPLAIN COMPLAIN! For whatever reason, it does not understand the forward declarations. Please ignore for now.
 
 // command
 extern int variable(const char *name, int min, int cur, int max, int *storage, void (*fun)(), bool persist);

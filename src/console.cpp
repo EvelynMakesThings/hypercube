@@ -177,7 +177,7 @@ namespace console
             if (SDL_GetModState()&(KMOD_LCTRL|KMOD_RCTRL)) { paste(); return; }
           default:
             resetcomplete();
-            if (cooked) { char add[] = { cooked, 0 }; strcat_s(commandbuf, add); }
+            if (cooked) { char add[] = { static_cast<char>(cooked), 0 }; strcat_s(commandbuf, add); }
         }
       } else {
         if (code==SDLK_RETURN) {

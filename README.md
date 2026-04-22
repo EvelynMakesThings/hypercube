@@ -3,6 +3,7 @@ FOREWARD
 
 HYPERCube is a modern copy of Cube (2001) designed to be easy to run on modern hardware and have QOL features.
 Below is the original text of the repository.
+NOTE: This currently targets linux only. Windows is untested and will most likely fail.
 
 
 ORIGINAL
